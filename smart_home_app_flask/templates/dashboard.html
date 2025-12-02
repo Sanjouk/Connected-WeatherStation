@@ -1,0 +1,294 @@
+{% extends "base.html" %}
+
+<!-- Set a specific title for this page -->
+{% block title %}Telemetry Dashboard{% endblock %}
+
+<!-- Inject the necessary JavaScript into the head block -->
+{% block head_extra %}
+    <script>
+      // --- API Configuration ---
+      // This path must match the Flask route defined in app.py (e.g., '/api/telemetry/latest')
+      const API_URL = '{{ url_for("get_latest_telemetry") }}';
+      const REFRESH_INTERVAL_MS = 5000; // Refresh every 5 seconds
+
+      // --- Global DOM Variables ---
+      let tempValue = null;
+      let humidityValue = null;
+      let lightValue = null;
+      let motionValue = null;
+      let motionCard = null;
+      let timestampDisplay = null;
+      let loadingIndicator = null;
+      let errorMessage = null;
+      let metricsContainer = null;
+
+      /**
+       * Initializes all global DOM variables by finding elements by their ID.
+       */
+      function initializeDOM() {
+          tempValue = document.getElementById('temp-value');
+          humidityValue = document.getElementById('humidity-value');
+          lightValue = document.getElementById('light-value');
+          motionValue = document.getElementById('motion-value');
+          motionCard = document.getElementById('motion-card');
+          timestampDisplay = document.getElementById('timestamp-display');
+          loadingIndicator = document.getElementById('loading-indicator');
+          errorMessage = document.getElementById('error-message');
+          metricsContainer = document.getElementById('metrics-container');
+      }
+
+      /**
+       * Formats an ISO date string into a readable time and date string.
+       * @param {string} isoString The ISO string from the database.
+       * @returns {string} Formatted date string.
+       */
+      function formatTimestamp(isoString) {
+          try {
+            const date = new Date(isoString);
+            if (isNaN(date)) return 'Invalid Date';
+            return date.toLocaleTimeString('en-US', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            }) + ' (' + date.toLocaleDateString('en-GB',{
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            }) + ')';
+          } catch (e) {
+              console.error("Error formatting timestamp:", e);
+              return 'Timestamp Error';
+          }
+      }
+
+      /**
+       * Updates the dashboard UI elements with the latest telemetry data.
+       * @param {object | null} data - The telemetry object from the API, or null if error/no data.
+       */
+      function updateUI(data) {
+          if (!tempValue || !humidityValue || !lightValue || !motionValue || !motionCard || !timestampDisplay) {
+              console.error("Critical DOM elements are missing. Cannot update UI.");
+              return;
+          }
+
+          if (data && data.timestamp) {
+              tempValue.textContent = `${data.temperature.toFixed(1)} °C`;
+              humidityValue.textContent = `${data.humidity.toFixed(0)} %`;
+              lightValue.textContent = `${data.light.toFixed(0)}`;
+
+              const isMotion = data.motion === true;
+              motionValue.textContent = isMotion ? 'DETECTED' : 'CLEAR';
+
+              // Handle Motion Sensor styling
+              const baseClass = 'metric-card text-white p-6 rounded-xl shadow-lg flex flex-col items-center';
+              // Check if motionCard exists before accessing its classList
+              if (motionCard) {
+                  if (isMotion) {
+                      motionCard.className = `bg-danger ${baseClass} motion-active`;
+                  } else {
+                      motionCard.className = `bg-gradient-to-br from-gray-700 to-gray-800 ${baseClass}`;
+                  }
+              }
+
+              timestampDisplay.textContent = formatTimestamp(data.timestamp.$date);
+
+              if (errorMessage) errorMessage.style.display = 'none';
+              if (metricsContainer) metricsContainer.style.opacity = '1';
+
+          } else {
+              // Reset values and show error
+              tempValue.textContent = '--';
+              humidityValue.textContent = '--';
+              lightValue.textContent = '--';
+              motionValue.textContent = '--';
+              timestampDisplay.textContent = 'Data unavailable';
+
+              if (errorMessage) errorMessage.style.display = 'block';
+              if (metricsContainer) metricsContainer.style.opacity = '0.5';
+          }
+      }
+
+      /**
+       * Fetches the latest reading from the API with built-in retry logic (exponential backoff).
+       */
+      async function fetchLatestReading() {
+          if (loadingIndicator) loadingIndicator.style.display = 'block';
+          if (errorMessage) errorMessage.style.display = 'none';
+
+          let data = null;
+          let attempt = 0;
+          const maxAttempts = 3;
+
+          while (attempt < maxAttempts) {
+              attempt++;
+              try {
+                  // We need to fetch the API_URL which is rendered by Jinja's url_for
+                  const response = await fetch(API_URL);
+
+                  if (response.ok) {
+                      data = await response.json();
+                      updateUI(data);
+                      break;
+                  } else if (response.status === 404) {
+                      console.warn('API returned 404: No readings found in the database.');
+                      updateUI(null);
+                      break;
+                  } else {
+                      throw new Error(`HTTP error! status: ${response.status}`);
+                  }
+              } catch (error) {
+                  // Log the failure, but only update UI to error state after max attempts
+                  if (attempt === maxAttempts) {
+                      console.error(`Attempt ${attempt} failed (FINAL):`, error.message);
+                      updateUI(null);
+                  } else {
+                      // Exponential backoff wait
+                      const delay = Math.pow(2, attempt) * 1000;
+                      await new Promise(resolve => setTimeout(resolve, delay));
+                  }
+              }
+          }
+
+          if (loadingIndicator) loadingIndicator.style.display = 'none';
+      }
+
+      // Start fetching data when the window loads
+      window.onload = function () {
+          initializeDOM();
+          // Initial fetch
+          fetchLatestReading();
+          // Set up interval for refreshing
+          setInterval(fetchLatestReading, REFRESH_INTERVAL_MS);
+      }
+    </script>
+{% endblock %}
+
+<!-- Inject the unique dashboard structure into the content block -->
+{% block content %}
+    <header class="text-center mb-10">
+        <h2 class="text-2xl sm:text-3xl font-bold text-primary mb-2">
+            Smart Home Telemetry Overview
+        </h2>
+        <p class="text-gray-500 text-sm">
+            Last data point recorded:
+            <span id="timestamp-display" class="font-medium text-gray-700"
+                >Loading...</span
+            >
+        </p>
+    </header>
+
+    <!-- Loading + Error -->
+    <div
+        id="loading-indicator"
+        class="text-center text-secondary font-semibold text-lg hidden"
+    >
+        Fetching latest data...
+    </div>
+
+    <div
+        id="error-message"
+        class="text-center text-danger text-lg p-4 bg-red-100 border border-red-400 rounded-lg hidden"
+    >
+        API Error. Check if your Flask server is running and the
+        <code>/api/telemetry/latest</code> endpoint is accessible.
+    </div>
+
+    <!-- Metrics -->
+    <div id="metrics-container" class="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <!-- Temperature -->
+        <div
+            class="metric-card bg-gradient-to-br from-indigo-500 to-purple-600 text-white p-6 rounded-xl shadow-lg flex flex-col items-center"
+        >
+            <svg
+                class="w-10 h-10 mb-3"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+            >
+                <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
+                ></path>
+            </svg>
+            <p class="text-sm uppercase opacity-80">Temperature</p>
+            <p id="temp-value" class="text-2xl sm:text-3xl font-bold mt-2">--</p>
+        </div>
+
+        <!-- Humidity -->
+        <div
+            class="metric-card bg-gradient-to-br from-blue-400 to-blue-500 text-white p-6 rounded-xl shadow-lg flex flex-col items-center"
+        >
+            <svg
+                class="w-10 h-10 mb-3"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+            >
+                <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 4v-4z"
+                ></path>
+            </svg>
+            <p class="text-sm uppercase opacity-80">Humidity</p>
+            <p id="humidity-value" class="text-3xl sm:text-3xl font-bold mt-2">
+                --
+            </p>
+        </div>
+
+        <!-- Light -->
+        <div
+            class="metric-card bg-gradient-to-br from-yellow-400 to-yellow-500 text-gray-800 p-6 rounded-xl shadow-lg flex flex-col items-center"
+        >
+        <svg
+                class="w-10 h-10 mb-3"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+            >
+                <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
+                ></path>
+        </svg>
+            <p class="text-sm uppercase opacity-80">Light Intensity</p>
+            <p id="light-value" class="text-3xl sm:text-3xl font-bold mt-2">--</p>
+        </div>
+
+        <!-- Motion -->
+        <div
+            id="motion-card"
+            class="metric-card bg-gradient-to-br from-gray-700 to-gray-800 text-white p-6 rounded-xl shadow-lg flex flex-col items-center"
+        >
+            <svg
+                class="w-10 h-10 mb-3"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+            >
+                <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                ></path>
+                <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                ></path>
+            </svg>
+            <p class="text-sm uppercase opacity-80">Motion Sensor</p>
+            <p id="motion-value" class="text-3xl sm:text-2xl font-bold mt-2">
+                --
+            </p>
+        </div>
+    </div>
+{% endblock %}
