@@ -67,7 +67,6 @@ def create_graph(df: pd.DataFrame, x_col: str, y_col: str, title: str) -> str:
     #
     # fig.write_image(filename)
     res = pio.to_json(fig, pretty=True)
-    print(res)
     return res
 
 

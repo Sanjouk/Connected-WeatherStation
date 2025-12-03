@@ -3,7 +3,6 @@
 {% block title %} Real-Time Sensor Dashboard {% endblock %}
 
 {% block head_extra %}
-    <!-- Plotly 3.3.0 -->
     <script type="text/javascript">window.PlotlyConfig = {MathJaxConfig: 'local'};</script>
     <script charset="utf-8"
             src="https://cdn.plot.ly/plotly-3.3.0.min.js"
@@ -33,23 +32,66 @@
 </h2>
 
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    {# 1. Jinja Loop: Only create the HTML containers for the graphs #}
     {% for graph in graphs %}
         <div class="graph-wrapper">
             <div id="{{ graph.id }}"></div>
         </div>
-
-        <script>
-            // Give each graph its own unique variable name
-            const graphData_{{ graph.id }} = {{ graph.json | safe }};
-
-            Plotly.newPlot(
-                "{{ graph.id }}",
-                graphData_{{ graph.id }}.data,
-                graphData_{{ graph.id }}.layout,
-                graphData_{{ graph.id }}.config || {responsive: true}
-            );
-        </script>
     {% endfor %}
 </div>
+<script>
+    // 1. Collect all graph IDs and initial JSON in a JS array
+    const graphs = [
+        {% for graph in graphs %}
+        {
+            id: "{{ graph.id }}",
+            data: {{ graph.json.data | tojson }},
+            layout: {{ graph.json.layout | tojson }},
+            // Use .config or default to empty object for safety
+            config: {{ graph.json.config | default("{}") | tojson }}
+        }{% if not loop.last %},{% endif %}
+        {% endfor %}
+    ];
+
+    // 2. Initial render
+    // Plotly.newPlot is called once for each graph
+    graphs.forEach(g => {
+        // Ensure config has responsive: true if not explicitly set
+        const config = g.config || {};
+        config.responsive = true;
+
+        Plotly.newPlot(g.id, g.data, g.layout, config);
+    });
+
+    // 3. Single update interval for all graphs
+    // **NOTE**: You were fetching from /updateTelemetryTable, but the
+    // proposed correct approach expects /api/telemetry/test, which returns
+    // an object mapping graph IDs to update data (e.g., { "temp_graph": { ... }, "pressure_graph": { ... } }).
+    // Make sure your backend API matches the expected structure.
+    setInterval(async () => {
+        try {
+            const res = await fetch("updateTelemetryTable");// Use the correct API endpoint
+            const updatedGraphs = await res.json(); // Expected format: { graph_id: {data, layout, config}, ... }
+            console.log(updatedGraphs);
+
+            // Loop over the local graphs array
+            graphs.forEach(g => {
+                let updated = updatedGraphs[g.id];
+
+                if (updated) {
+                    if (typeof updated === "string") {
+                        updated = JSON.parse(updated);
+                    }
+                    // Use Plotly.react for efficient partial updates
+                    // Ensure updated.config defaults to the existing config or includes responsive: true
+                    const config = updated.config || { responsive: true };
+                    Plotly.react(g.id, updated.data, updated.layout, config);
+                }
+            });
+        } catch (err) {
+            console.error("Graph update failed:", err);
+        }
+    }, 3000); // Update every 3 seconds
+</script>
 
 {% endblock %}

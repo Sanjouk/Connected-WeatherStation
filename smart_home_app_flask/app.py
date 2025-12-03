@@ -96,11 +96,42 @@ def telemetry_table():
         graphs.append({
             'id': col_name.replace('_', '-'),  # unique ID for the HTML div
             'title': title,
-            'json': graph_json
+            'json': json.loads(graph_json)
         })
 
     # 4. Render the template, passing the list of graph data
     return render_template('telemetry_table.html', graphs=graphs)
+
+
+
+@app.route('/updateTelemetryTable')
+def update_telemetry_table():
+    lines = 10
+    df = get_telemetry_measurements(lines=lines, collection=TELEMETRY_COLLECTION)
+    measurement_columns = [
+        ('temperature', 'Hourly Temperature (°C)'),
+        ('humidity', 'Hourly Relative Humidity (%)'),
+        ('light', 'Hourly Ambient Light (lux)'),
+    ]
+
+    graphs_map = {}
+    for col_name, title in measurement_columns:
+
+        graph_json = create_graph(
+            df,
+            x_col='timestamp',
+            y_col=col_name,
+            title=title
+        )
+
+        graph_id = col_name.replace('_', '-')
+
+        # Populate the map with the graph ID as the key, and the JSON data as the value
+        graphs_map[graph_id] = graph_json
+
+        # Return the dictionary instead of the list
+        # jsonify will convert the dict into the JSON object the client expects
+    return jsonify(graphs_map)
 
 # @app.route('/telemetryTable')
 # def telemetry_table():
