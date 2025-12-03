@@ -1,10 +1,13 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, send_from_directory
 from flask_pymongo import PyMongo
 from bson.objectid import ObjectId
 from datetime import datetime
 import requests
 from pydantic import BaseModel, Field, ValidationError
 from typing import Optional
+
+import json
+import os
 
 from data.db import init_db, get_collection
 from helpers.helpers import create_graph, get_telemetry_measurements
@@ -23,6 +26,14 @@ SETTINGS_COLLECTION = get_collection("settings")
 # USERS_COLLECTION = get_collection("users")
 # DEVICES_COLLECTION = get_collection("devices")
 # LOGS_COLLECTION = get_collection("logs")
+
+
+GRAPH_DIR = 'graphs'
+
+@app.route(f'/{GRAPH_DIR}/<path:filename>')
+def serve_graphs(filename):
+    """Serves files from the custom 'graphs' directory."""
+    return send_from_directory(GRAPH_DIR, filename)
 
 # ESP32 init
 
@@ -70,8 +81,10 @@ def telemetry_table():
         ('humidity', 'Hourly Relative Humidity (%)'),
         ('light', 'Hourly Ambient Light (lux)'),
     ]
+
     graphs = []
     for col_name, title in measurement_columns:
+
         graph_json = create_graph(
             df,
             x_col='timestamp',
@@ -89,11 +102,57 @@ def telemetry_table():
     # 4. Render the template, passing the list of graph data
     return render_template('telemetry_table.html', graphs=graphs)
 
+# @app.route('/telemetryTable')
+# def telemetry_table():
+#     # 1. Ensure the graphs directory exists
+#     if not os.path.exists(GRAPH_DIR):
+#         os.makedirs(GRAPH_DIR)
+#         print(f"Created graph directory: {GRAPH_DIR}")
+#
+#     lines = 10
+#     df = get_telemetry_measurements(lines=lines, collection=TELEMETRY_COLLECTION)
+#     measurement_columns = [
+#         ('temperature', 'Hourly Temperature (°C)'),
+#         ('humidity', 'Hourly Relative Humidity (%)'),
+#         ('light', 'Hourly Ambient Light (lux)'),
+#     ]
+#
+#     graphs = []
+#     print(df)
+#     for col_name, title in measurement_columns:
+#
+#         # Call the updated create_graph, which saves the HTML file and returns the path
+#         graph_filepath = create_graph(
+#             df,
+#             x_col='timestamp',
+#             y_col=col_name,
+#             title=title,
+#             output_dir=GRAPH_DIR # Pass the output directory
+#         )
+#
+#         # Store the filepath for the template instead of the JSON string
+#         graphs.append({
+#             'id': col_name.replace('_', '-'),  # unique ID for the HTML iframe
+#             'title': title,
+#             'filepath': graph_filepath # Changed 'json' to 'filepath'
+#         })
+#
+#     # 4. Render the template, passing the list of graph data
+#     return render_template('telemetry_table.html', graphs=graphs)
+
+
+# @app.route('/api/telemetry/test')
+# def test_telemetry():
+#     return null
+
+
 
 # PART OF API
 def doc_to_json(document):
     if document:
         document['_id'] = str(document['_id'])
+        if 'timestamp' in document and isinstance(document['timestamp'], datetime):
+            document['timestamp'] = document['timestamp'].isoformat()
         return document
     return None
 @app.route('/api/telemetry', methods=['POST'])
@@ -241,4 +300,4 @@ if __name__ == '__main__':
     print(f"API access point: http://127.0.0.1:{PORT}/api/telemetry/latest")
     print("-" * 50)
     # The debug=True flag enables auto-reloading during development
-    app.run(debug=True, port=PORT)
+    app.run(host="0.0.0.0", debug=True, port=PORT)

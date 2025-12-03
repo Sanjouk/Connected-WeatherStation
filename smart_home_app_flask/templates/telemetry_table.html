@@ -1,56 +1,55 @@
 {% extends "base.html" %}
 
 {% block title %} Real-Time Sensor Dashboard {% endblock %}
-{% block head_extra%}
-    <script src="https://cdn.plot.ly/plotly-2.26.1.min.js"></script>
-<style>
-        /* Добавляем CSS для лучшего отображения графиков
-        - margin-bottom: 2.5rem; (40px) создает большой вертикальный отступ между графиками.
-        - padding: 1.5rem; (24px) создает внутренний отступ для "карточки" графика.
-        - border-radius: 0.5rem; (8px) скругляет углы.
-        - box-shadow: ... добавляет мягкую тень, делая график похожим на "карточку".
-        */
+
+{% block head_extra %}
+    <!-- Plotly 3.3.0 -->
+    <script type="text/javascript">window.PlotlyConfig = {MathJaxConfig: 'local'};</script>
+    <script charset="utf-8"
+            src="https://cdn.plot.ly/plotly-3.3.0.min.js"
+            integrity="sha256-bO3dS6yCpk9aK4gUpNELtCiDeSYvGYnK7jFI58NQnHI="
+            crossorigin="anonymous"></script>
+
+    <style>
         .graph-wrapper {
-            margin-bottom: 2.5rem; /* Отступ под каждым графиком */
-            padding: 1.5rem; /* Внутренний отступ вокруг графика */
-            background-color: #ffffff; /* Белый фон для "карточки" */
-            border-radius: 0.5rem; /* Скругление углов */
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1); /* Мягкая тень */
-            /* Убедитесь, что div, в который рендерится Plotly, имеет заданный размер */
-            height: 400px; /* Задаем фиксированную высоту для каждого графика */
+            margin-bottom: 2.5rem;
+            padding: 1.5rem;
+            background-color: #ffffff;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+                        0 2px 4px -2px rgba(0, 0, 0, 0.1);
+            height: 400px;
         }
-
-        /* Убираем высоту по умолчанию, установленную в HTML-теге style,
-           чтобы она бралась из .graph-wrapper (если вы используете height: 100%
-           внутреннему div) */
         .graph-wrapper > div {
-             height: 100% !important;
+            height: 100% !important;
+            width: 100% !important;
         }
-
     </style>
-
 {% endblock %}
 
 {% block content %}
-<h2 class="text-3xl font-bold text-gray-900 mb-8 text-center sm:text-left">Real-Time Sensor Dashboard </h2>
+<h2 class="text-3xl font-bold text-gray-900 mb-8 text-center sm:text-left">
+    Real-Time Sensor Dashboard
+</h2>
 
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            {% for graph in graphs %}
-                <div class="graph-wrapper">
-                    <div id="{{ graph.id }}"></div>
-                </div>
-
-                <script>
-                    // Получаем уникальные данные JSON для конкретного графика
-                    // Фильтр | safe обязателен для вставки строки JSON без экранирования HTML
-                    var graphData = {{ graph.json | safe }};
-
-                    // Plotly.js рендерит график в соответствующий ID div
-                    Plotly.newPlot('{{ graph.id }}', graphData.data, graphData.layout, {
-                        responsive: true // Добавляем опцию для лучшей адаптивности
-                    });
-                </script>
-            {% endfor %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    {% for graph in graphs %}
+        <div class="graph-wrapper">
+            <div id="{{ graph.id }}"></div>
         </div>
+
+        <script>
+            // Give each graph its own unique variable name
+            const graphData_{{ graph.id }} = {{ graph.json | safe }};
+
+            Plotly.newPlot(
+                "{{ graph.id }}",
+                graphData_{{ graph.id }}.data,
+                graphData_{{ graph.id }}.layout,
+                graphData_{{ graph.id }}.config || {responsive: true}
+            );
+        </script>
+    {% endfor %}
+</div>
 
 {% endblock %}
