@@ -9,29 +9,51 @@
             Adjust the environment of your smart home below. Changes are applied instantly to connected devices.
         </p>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-6">
 
-            <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
-                <div class="flex items-center mb-4">
-                    <svg class="w-7 h-7 text-yellow-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M3.636 5.636l.707.707m0 12.728l.707-.707m6.364-12.728l-.707-.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-                    <h3 class="font-semibold text-xl text-gray-800">Global Light Intensity</h3>
+<!--            <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-100">-->
+<!--                <div class="flex items-center mb-4">-->
+<!--                    <svg class="w-7 h-7 text-yellow-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M3.636 5.636l.707.707m0 12.728l.707-.707m6.364-12.728l-.707-.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>-->
+<!--                    <h3 class="font-semibold text-xl text-gray-800">Global Light Intensity</h3>-->
+<!--                </div>-->
+<!--                <label for="lightRange" class="block text-sm font-medium text-gray-600 mb-2">Intensity Level: <span id="lightValue" class="font-bold text-primary">50%</span></label>-->
+<!--                <input type="range" id="lightRange" min="0" max="100" value="50" oninput="updateRangeValue('light', this.value)" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer range-lg">-->
+<!--                <p class="text-xs text-gray-500 mt-3">Controls the main light brightness globally.</p>-->
+<!--            </div>-->
+
+<!--            <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-100">-->
+<!--                <div class="flex items-center mb-4">-->
+<!--                    <svg class="w-7 h-7 text-red-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10a2 2 0 00-4 0v4a2 2 0 104 0v-4z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.305 10A2.001 2.001 0 016 7c3.314-4 8.686-4 12 0a2 2 0 011.695 3l-.8 8.085A2 2 0 0117.2 20H6.8a2 2 0 01-1.695-1.915l-.8-8.085z"></path></svg>-->
+<!--                    <h3 class="font-semibold text-xl text-gray-800">Target Temperature</h3>-->
+<!--                </div>-->
+<!--                <label for="tempRange" class="block text-sm font-medium text-gray-600 mb-2">Set Temperature: <span id="tempValue" class="font-bold text-primary">22°C</span></label>-->
+<!--                <input type="range" id="tempRange" min="15" max="30" value="22" oninput="updateRangeValue('temp', this.value)" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer range-lg">-->
+<!--                <p class="text-xs text-gray-500 mt-3">Adjust the desired room temperature (15-30°C).</p>-->
+<!--            </div>-->
+            <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-100 sm:col-span-2">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center">
+                        <svg class="w-7 h-7 text-green-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 10a3 3 0 116 0V7a3 3 0 11-6 0v3z"></path>
+                        </svg>
+                        <h3 class="font-semibold text-xl text-gray-800">Security System</h3>
+                    </div>
+
+                    <label for="securityToggle" class="flex items-center cursor-pointer">
+                        <div class="relative">
+                            <input type="checkbox" id="securityToggle" class="sr-only" onchange="updateSecurityStatus(this.checked)">
+                            <div class="block bg-gray-600 w-14 h-8 rounded-full transition-all duration-300"></div>
+                            <div class="dot absolute left-1 top-1 bg-white w-6 h-6 rounded-full transition-transform transform duration-300"></div>
+                        </div>
+                        <div id="securityStatus" class="ml-3 text-lg font-bold text-gray-600">Off</div>
+                    </label>
                 </div>
-                <label for="lightRange" class="block text-sm font-medium text-gray-600 mb-2">Intensity Level: <span id="lightValue" class="font-bold text-primary">50%</span></label>
-                <input type="range" id="lightRange" min="0" max="100" value="50" oninput="updateRangeValue('light', this.value)" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer range-lg">
-                <p class="text-xs text-gray-500 mt-3">Controls the main light brightness globally.</p>
+
+                <p class="text-xs text-gray-500 mt-3">Toggle the system to turn the home security on or off.</p>
             </div>
 
-            <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
-                <div class="flex items-center mb-4">
-                    <svg class="w-7 h-7 text-red-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10a2 2 0 00-4 0v4a2 2 0 104 0v-4z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.305 10A2.001 2.001 0 016 7c3.314-4 8.686-4 12 0a2 2 0 011.695 3l-.8 8.085A2 2 0 0117.2 20H6.8a2 2 0 01-1.695-1.915l-.8-8.085z"></path></svg>
-                    <h3 class="font-semibold text-xl text-gray-800">Target Temperature</h3>
-                </div>
-                <label for="tempRange" class="block text-sm font-medium text-gray-600 mb-2">Set Temperature: <span id="tempValue" class="font-bold text-primary">22°C</span></label>
-                <input type="range" id="tempRange" min="15" max="30" value="22" oninput="updateRangeValue('temp', this.value)" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer range-lg">
-                <p class="text-xs text-gray-500 mt-3">Adjust the desired room temperature (15-30°C).</p>
-            </div>
-
-            <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-100 lg:col-span-2">
+            <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-100 lg:col-span-2 sm:col-span-2">
                 <div class="flex items-center mb-4">
                     <svg class="w-7 h-7 text-sky-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2zm10 0v-8M9 21v-8"></path></svg>
                     <h3 class="font-semibold text-xl text-gray-800">Curtain Automation Scene ☀️</h3>
@@ -56,9 +78,10 @@
                     <p class="text-xs text-gray-500 mt-1">Set the light level the main light will adjust to when the curtains close. (Default: 40%)</p>
                 </div>
 
-                <button id="curtainButton" onclick="toggleCurtains()" class="w-full px-4 py-3 text-white font-semibold rounded-lg shadow-md transition duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 bg-sky-500 hover:bg-sky-600 focus:ring-sky-500">
-                    <span id="curtainStatus">Curtains Open (Toggle Manual)</span>
-                </button>
+<!--                <button id="curtainButton" onclick="toggleCurtains()" class="w-full px-4 py-3 text-white font-semibold rounded-lg shadow-md transition duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 bg-sky-500 hover:bg-sky-600 focus:ring-sky-500">-->
+<!--                    <span id="curtainStatus">Curtains Open (Toggle Manual)</span>-->
+<!--                </button>-->
+                <button id="curtainButton" onclick="sendCurtainSettings()" class="w-full px-4 py-3 text-white font-semibold rounded-lg shadow-md transition duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 bg-sky-500 hover:bg-sky-600 focus:ring-sky-500"> Set </button>
             </div>
 
             </div>
@@ -66,39 +89,114 @@
 
     <script>
         // Default settings for initialization
-        const DEFAULT_SETTINGS = {
-            curtainCloseTemp: 27, // Default: 27°C
-            closedCurtainLightIntensity: 40, // Default: 40%
-            climateMode: 'Cooling' // Default: Cooling
-        };
+        let autoCloseTemp = 10;
 
-        // State variables
-        let areCurtainsOpen = true;
-        let isLightOn = false;
-        let currentClimateMode = DEFAULT_SETTINGS.climateMode;
+        async function loadSettings(){
+            try{
+                const response = await fetch("/api/settings")
+                if (!response.ok) console.log(`HTTP error! Status: ${response.status}`);
+                const data = await response.json();
+                console.log(data);
+                console.log(data);
+
+                document.getElementById('closeTempRange').value = data.curtains.autoCloseTemp;
+                updateRangeValue('closeTemp', data.curtains.autoCloseTemp);
+
+                document.getElementById('closeLightRange').value = data.curtains.lightIntensityWhenClosed;
+                updateRangeValue('closeLight', data.curtains.lightIntensityWhenClosed);
+
+                document.getElementById('closeTime').value = data.curtains.autoCloseTime;
+                setCurtainSchedule(data.curtains.autoCloseTime);
+
+                document.getElementById('securityToggle').checked = data.securitySystem.defaultState;
+                document.getElementById('securityStatus').textContent = data.securitySystem.defaultState ? "On" : "Off";
+            } catch (err){
+                console.error("Failed to load settings:", err)
+            }
+        }
 
         // send to flask function
-        async function sendToFlask(endpoint, data){
+        // async function sendToFlask(endpoint, data){
+        //     try{
+        //         const response = await fetch(`api/${endpoint}`, {
+        //             method: "POST",
+        //             headers: {"Content-Type": "application/json"},
+        //             body: JSON.stringify(data)
+        //         });
+        //
+        //         if (!response.ok){
+        //             console.error(`Server error @ /api/${endpoint}:`, response.status);
+        //             return null
+        //         }
+        //
+        //         const json = await response.json();
+        //         console.log(`Flask → ESP32 response (/api/${endpoint}):`, json);
+        //         return json;
+        //     } catch (err){
+        //         console.error(`Request failed @ /api/${endpoint}:`, err);
+        //         return null;
+        //     }
+        // }
+
+        async function sendToFlask(data){
             try{
-                const response = await fetch(`api/${endpoint}`, {
-                    method: "POST",
+                const response = await fetch(`api/settings`, {
+                    method: "PUT",
                     headers: {"Content-Type": "application/json"},
                     body: JSON.stringify(data)
-                });
+                })
 
-                if (!response.ok){
-                    console.error(`Server error @ /api/${endpoint}:`, response.status);
-                    return null
+               if (!response.ok){
+                   console.error(`Server error @ /api/settings:`, response.status);
+                   return null
                 }
 
                 const json = await response.json();
-                console.log(`Flask → ESP32 response (/api/${endpoint}):`, json);
+                console.log(`Flask → ESP32 response (/api/settings):`, json);
                 return json;
-            } catch (err){
-                console.error(`Request failed @ /api/${endpoint}:`, err);
+            }catch (err){
+                console.error(`Request failed @ /api/settings:`, err);
                 return null;
             }
         }
+
+        async function sendCurtainSettings(){
+            const closeTime = document.getElementById('closeTime').value;
+            const closeTemp = document.getElementById('closeTempRange').value;
+            const closeLight = document.getElementById('closeLightRange').value;
+
+            const settingPayload = {
+                "changes": {
+                    "curtains.autoCloseTime": closeTime,
+                    "curtains.autoCloseTemp": closeTemp,
+                    "curtains.lightIntensityWhenClosed": closeLight
+                }
+            }
+
+            const response = await sendToFlask(settingPayload);
+
+            const button = document.getElementById('curtainButton');
+            // if (response && response.success) {
+            if (response){
+                alert("Curtain settings updated successfully!");
+                // Optional: briefly change button style to confirm success
+                button.classList.remove('bg-sky-500', 'hover:bg-sky-600', 'focus:ring-sky-500');
+                button.classList.add('bg-green-500', 'hover:bg-green-600', 'focus:ring-green-500');
+                setTimeout(() => {
+                    button.classList.remove('bg-green-500', 'hover:bg-green-600', 'focus:ring-green-500');
+                    button.classList.add('bg-sky-500', 'hover:bg-sky-600', 'focus:ring-sky-500');
+                }, 1500); // Revert after 1.5 seconds
+            } else {
+                alert("Failed to update curtain settings. See console for details.");
+                // Optional: briefly change button style to indicate failure
+                button.classList.remove('bg-sky-500', 'hover:bg-sky-600', 'focus:ring-sky-500');
+                button.classList.add('bg-red-500', 'hover:bg-red-600', 'focus:ring-red-500');
+                setTimeout(() => {
+                    button.classList.remove('bg-red-500', 'hover:bg-red-600', 'focus:ring-red-500');
+                    button.classList.add('bg-sky-500', 'hover:bg-sky-600', 'focus:ring-sky-500');
+                }, 1500); // Revert after 1.5 seconds
+        }
+            }
 
 
         // Function to update range values on the screen
@@ -106,107 +204,150 @@
             if (type === 'light') {
                 document.getElementById('lightValue').textContent = `${value}%`;
                 console.log(`Setting global light intensity to ${value}%`);
-                sendToFlask("light/intensity", {value: value});
+                // sendToFlask("light/intensity", {value: value});
             } else if (type === 'temp') {
                 document.getElementById('tempValue').textContent = `${value}°C`;
                 console.log(`Setting target temperature to ${value}°C`);
-                sendToFlask("target_temperature", {value: value});
+                // sendToFlask("target_temperature", {value: value});
+
             } else if (type === 'closeLight') {
                 document.getElementById('closeLightValue').textContent = `${value}%`;
                 console.log(`Setting automated closing light intensity to ${value}%`);
             } else if (type === 'closeTemp') {
                 document.getElementById('closeTempValue').textContent = `${value}°C`;
                 console.log(`Setting curtain close temperature threshold to ${value}°C`);
+
             }
         }
 
         // Function to set scheduled curtain close time
         function setCurtainSchedule(time) {
             document.getElementById('scheduleTime').textContent = time;
+            // sendToFlask('curtain_time', {time: time});
             console.log(`Curtain close time scheduled for ${time}. Light intensity upon close: ${document.getElementById('closeLightRange').value}%.`);
-            // In a real app: call API to set schedule
         }
 
 
         // Function to set climate mode from dropdown
-        function setClimateMode(mode) {
-            currentClimateMode = mode;
-            const select = document.getElementById('climateModeSelect');
-
-            // Set button/select color based on mode
-            select.classList.remove('focus:border-red-500', 'focus:ring-red-500', 'focus:border-gray-500', 'focus:ring-gray-500');
-            if (mode === 'Cooling') {
-                select.classList.add('focus:border-blue-500', 'focus:ring-blue-500');
-                console.log('Climate mode set to COOLING.');
-            } else if (mode === 'Warming') {
-                select.classList.add('focus:border-red-500', 'focus:ring-red-500');
-                console.log('Climate mode set to WARMING.');
-            } else {
-                // Off mode
-                select.classList.add('focus:border-gray-500', 'focus:ring-gray-500');
-                console.log('Climate mode set to OFF.');
-            }
-            // In a real app: call API to set mode
-        }
+        // function setClimateMode(mode) {
+        //     currentClimateMode = mode;
+        //     const select = document.getElementById('climateModeSelect');
+        //
+        //     // Set button/select color based on mode
+        //     select.classList.remove('focus:border-red-500', 'focus:ring-red-500', 'focus:border-gray-500', 'focus:ring-gray-500');
+        //     if (mode === 'Cooling') {
+        //         select.classList.add('focus:border-blue-500', 'focus:ring-blue-500');
+        //         console.log('Climate mode set to COOLING.');
+        //     } else if (mode === 'Warming') {
+        //         select.classList.add('focus:border-red-500', 'focus:ring-red-500');
+        //         console.log('Climate mode set to WARMING.');
+        //     } else {
+        //         // Off mode
+        //         select.classList.add('focus:border-gray-500', 'focus:ring-gray-500');
+        //         console.log('Climate mode set to OFF.');
+        //     }
+        //     // In a real app: call API to set mode
+        // }
 
         // Function to toggle curtains (Manual Override)
-        function toggleCurtains() {
-            areCurtainsOpen = !areCurtainsOpen;
-            const button = document.getElementById('curtainButton');
-            const statusSpan = document.getElementById('curtainStatus');
-
-            if (areCurtainsOpen) {
-                statusSpan.textContent = 'Curtains Open (Toggle Manual)';
-                button.classList.remove('bg-red-500', 'hover:bg-red-600', 'focus:ring-red-500');
-                button.classList.add('bg-sky-500', 'hover:bg-sky-600', 'focus:ring-sky-500');
-                console.log('Curtains opened manually.');
-            } else {
-                statusSpan.textContent = 'Curtains Closed (Toggle Manual)';
-                button.classList.remove('bg-sky-500', 'hover:bg-sky-600', 'focus:ring-sky-500');
-                button.classList.add('bg-red-500', 'hover:bg-red-600', 'focus:ring-red-500');
-                console.log('Curtains closed manually.');
-            }
-        }
+        // function toggleCurtains() {
+        //     areCurtainsOpen = !areCurtainsOpen;
+        //     const button = document.getElementById('curtainButton');
+        //     const statusSpan = document.getElementById('curtainStatus');
+        //
+        //     if (areCurtainsOpen) {
+        //         statusSpan.textContent = 'Curtains Open (Toggle Manual)';
+        //         button.classList.remove('bg-red-500', 'hover:bg-red-600', 'focus:ring-red-500');
+        //         button.classList.add('bg-sky-500', 'hover:bg-sky-600', 'focus:ring-sky-500');
+        //         console.log('Curtains opened manually.');
+        //     } else {
+        //         statusSpan.textContent = 'Curtains Closed (Toggle Manual)';
+        //         button.classList.remove('bg-sky-500', 'hover:bg-sky-600', 'focus:ring-sky-500');
+        //         button.classList.add('bg-red-500', 'hover:bg-red-600', 'focus:ring-red-500');
+        //         console.log('Curtains closed manually.');
+        //     }
+        // }
 
         // Function to toggle lights
-        function toggleLightSwitch() {
-            isLightOn = !isLightOn;
-            const button = document.getElementById('lightSwitchButton');
-            const statusSpan = document.getElementById('lightSwitchStatus');
+        // function toggleLightSwitch() {
+        //     isLightOn = !isLightOn;
+        //     const button = document.getElementById('lightSwitchButton');
+        //     const statusSpan = document.getElementById('lightSwitchStatus');
+        //
+        //     if (isLightOn) {
+        //         statusSpan.textContent = 'Lights On';
+        //         button.classList.remove('bg-gray-400', 'hover:bg-gray-500', 'focus:ring-gray-400');
+        //         button.classList.add('bg-yellow-500', 'hover:bg-yellow-600', 'focus:ring-yellow-500');
+        //         console.log('Lights switched ON.');
+        //     } else {
+        //         statusSpan.textContent = 'Lights Off';
+        //         button.classList.remove('bg-yellow-500', 'hover:bg-yellow-600', 'focus:ring-yellow-500');
+        //         button.classList.add('bg-gray-400', 'hover:bg-gray-500', 'focus:ring-gray-400');
+        //         console.log('Lights switched OFF.');
+        //     }
+        // }
 
-            if (isLightOn) {
-                statusSpan.textContent = 'Lights On';
-                button.classList.remove('bg-gray-400', 'hover:bg-gray-500', 'focus:ring-gray-400');
-                button.classList.add('bg-yellow-500', 'hover:bg-yellow-600', 'focus:ring-yellow-500');
-                console.log('Lights switched ON.');
+        function updateSecurityStatus(){
+            return null;
+        }
+
+        async function updateSecurityStatus(isChecked, sendUpdate = true){
+            const statusTextElement = document.getElementById('securityStatus');
+            const toggleBlock = document.querySelector('#securityToggle + .block');
+            const toggleDot = document.querySelector('#securityToggle + .block + .dot');
+            const statusText = isChecked ? "On" : "Off";
+
+            // 1. Update the display text
+            statusTextElement.textContent = statusText;
+
+            // 2. Update the color class based on the security status (On/Off)
+            if (isChecked) {
+                // Систем ВКЛ: сместить ползунок и поменять цвет трека на зеленый
+                statusTextElement.classList.remove('text-gray-600');
+                statusTextElement.classList.add('text-green-600');
+
+                toggleBlock.classList.remove('bg-gray-600');
+                toggleBlock.classList.add('bg-green-600');
+                // !!! ЭТОТ КЛАСС ПЕРЕМЕЩАЕТ ТОЧКУ ВПРАВО !!!
+                toggleDot.classList.add('translate-x-full');
+
             } else {
-                statusSpan.textContent = 'Lights Off';
-                button.classList.remove('bg-yellow-500', 'hover:bg-yellow-600', 'focus:ring-yellow-500');
-                button.classList.add('bg-gray-400', 'hover:bg-gray-500', 'focus:ring-gray-400');
-                console.log('Lights switched OFF.');
+                // Систем ВЫКЛ: вернуть ползунок и поменять цвет трека на серый
+                statusTextElement.classList.remove('text-green-600');
+                statusTextElement.classList.add('text-gray-600');
+
+                toggleBlock.classList.remove('bg-green-600');
+                toggleBlock.classList.add('bg-gray-600');
+
+                // !!! УДАЛЕНИЕ КЛАССА ВОЗВРАЩАЕТ ТОЧКУ ВЛЕВО !!!
+                toggleDot.classList.remove('translate-x-full');
+                }
+
+            console.log(`Security system set to ${statusText}.`);
+
+            // 3. Send update to the server (if not just loading initial settings)
+            if (sendUpdate) {
+                const settingPayload = {
+                    "changes": {
+                        "securitySystem.defaultState": isChecked
+                    }
+                };
+
+                const response = await sendToFlask(settingPayload);
+
+                if (!response) {
+                    alert(`Failed to set security to ${statusText}. Check console for details.`);
+                    // Optional: Revert the toggle visually if the API call fails
+                    const toggle = document.getElementById('securityToggle');
+                    toggle.checked = !isChecked;
+                    updateSecurityStatus(!isChecked, false); // Revert UI without sending API call
+                }
             }
         }
 
         // Initialize state on load
         window.onload = function() {
-            // Initialize range values
-            updateRangeValue('light', document.getElementById('lightRange').value);
-            updateRangeValue('temp', document.getElementById('tempRange').value);
-            setCurtainSchedule(document.getElementById('closeTime').value);
-
-            // Initialize settings based on DEFAULT_SETTINGS object
-
-            // Curtain Close Temperature
-            document.getElementById('closeTempRange').value = DEFAULT_SETTINGS.curtainCloseTemp;
-            updateRangeValue('closeTemp', DEFAULT_SETTINGS.curtainCloseTemp);
-
-            // Light Intensity when Closed
-            document.getElementById('closeLightRange').value = DEFAULT_SETTINGS.closedCurtainLightIntensity;
-            updateRangeValue('closeLight', DEFAULT_SETTINGS.closedCurtainLightIntensity);
-
-            // Climate Mode (set both state and UI dropdown)
-            document.getElementById('climateModeSelect').value = DEFAULT_SETTINGS.climateMode;
-            setClimateMode(DEFAULT_SETTINGS.climateMode);
+            loadSettings();
         };
     </script>
 {% endblock %}

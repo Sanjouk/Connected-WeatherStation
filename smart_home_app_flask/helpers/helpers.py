@@ -1,11 +1,11 @@
 import pandas as pd
 import plotly.express as px
-from plotly.utils import PlotlyJSONEncoder
 import json
 from pymongo.collection import Collection
 import plotly.io as pio
-from datetime import datetime
-import os
+from data.db import get_collection
+
+
 
 def create_graph(df: pd.DataFrame, x_col: str, y_col: str, title: str) -> str:
     """
@@ -157,5 +157,22 @@ def get_telemetry_measurements(lines: int, collection: Collection) -> pd.DataFra
         return pd.DataFrame()
 
 
+def build_graph(lines:int = 10) -> list:
+    TELEMETRY_COLLECTION = get_collection('telemetry')
+    df = get_telemetry_measurements(lines=lines, collection=TELEMETRY_COLLECTION)
+
+    # We will need to change this to out-print proper titles
+    measurement_columns = [
+        ('temperature', 'Hourly Temperature (°C)'),
+        ('humidity', 'Hourly Relative Humidity (%)'),
+        ('light', 'Hourly Ambient Light (lux)'),
+    ]
+
+    graphs = []
+    for col_name, title in measurement_columns:
+        graph_json = create_graph(df=df, x_col='timestamp', y_col=col_name, title=title)
+        graphs.append({'id': col_name.replace('_', '-'), 'title': title, 'json': json.loads(graph_json) })
+
+    return graphs
 
 

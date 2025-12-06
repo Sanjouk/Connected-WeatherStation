@@ -70,7 +70,7 @@
     // Make sure your backend API matches the expected structure.
     setInterval(async () => {
         try {
-            const res = await fetch("updateTelemetryTable");// Use the correct API endpoint
+            const res = await fetch("{{url_for('telemetry_api.update_telemetry_table')}}");// Use the correct API endpoint
             const updatedGraphs = await res.json(); // Expected format: { graph_id: {data, layout, config}, ... }
             console.log(updatedGraphs);
 
